@@ -1,0 +1,1061 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<!-- Video Background -->
+<!--<div class="video-background">
+    <video autoplay muted loop id="myVideo">
+        <source src="{% static 'images/bg.mp4' %}" type="video/mp4">
+    </video>
+</div>-->
+<div id="bgLayers_comp-kbgaghri" data-hook="bgLayers" data-motion-part="BG_LAYER" class="MW5IWV"><div data-testid="colorUnderlay" class="LWbAav Kv1aVt"></div><div id="bgMedia_comp-kbgaghri" data-motion-part="BG_MEDIA" class="VgO9Yg"></div></div>
+<div class="creator-profile">
+    <!-- Social Media Icons -->
+    <div class="social-icons">
+        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-behance"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-pinterest"></i></a>
+    </div>
+
+    <!-- Profile Info -->
+    <div class="profile-container">
+        <div class="profile-info">
+            <h1>{{ about.name }}</h1>
+            <h2>{{ about.title }}</h2>
+            <!--<h2>İçerik</h2>-->
+        </div>
+        <div class="profile-avatar" id="avatarContainer">
+            <lottie-player 
+                id="avatarAnimation"
+                src="https://lottie.host/850c891c-ed91-4fbb-af94-3cd88c170cb8/oEadyxq1XZ.json"
+                background="transparent"
+                speed="2"
+                class="lottie-avatar"
+                loop
+                autoplay>
+            </lottie-player>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <div class="button-row">
+            <a href="#" class="action-button" onclick="openAboutModal()">Hakkımda</a>
+            <a href="#" class="action-button" onclick="openEducationModal()">Eğitim</a>
+            <a href="#" class="action-button" onclick="openExperienceModal()">Deneyim</a>
+            <a href="#" class="action-button" onclick="openSkillsModal()">Yetenekler</a>
+            <a href="#" class="action-button" onclick="openCertificatesModal()">Sertifikalar</a>
+        </div>
+    </div>
+</div>
+
+<!-- PDF Button Container -->
+<div class="cv-download-container">
+    <a href="{% url 'download_pdf' %}" class="cv-download-button" id="downloadButton">
+        <span class="button-content">
+            <i class="fas fa-file-pdf pdf-icon"></i>
+            <span class="button-text">CV İndir</span>
+        </span>
+    </a>
+</div>
+
+<!-- About Modal -->
+<div id="aboutModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAboutModal()">&times;</span>
+        <h2 class="modal-title">Hakkımda</h2>
+        <div class="about-content">
+            <p>{{ about.message }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Education Modal -->
+<div id="educationModal" class="modal">
+    <div class="modal-content education-modal">
+        <span class="close-button" onclick="closeEducationModal()">&times;</span>
+        <h2 class="modal-title">Eğitim Geçmişi</h2>
+        <div class="education-content">
+            {% for education in educations %}
+                <div class="education-card">
+                    <div class="education-header">
+                        <h3 class="institution-name">{{ education.institution }}</h3>
+                        <span class="education-date">{{ education.end_date|date:"Y" }}</span>
+                    </div>
+                    <div class="education-details">
+                        <p class="degree">{{ education.degree }}</p>
+                        <p class="field-of-study">{{ education.field_of_study }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Experience Modal -->
+<div id="experienceModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeExperienceModal()">&times;</span>
+        <h2 class="modal-title">Deneyimler</h2>
+        <div class="experience-content">
+            {% for exp in experiences %}
+                <div class="experience-card">
+                    <div class="experience-header">
+                        <h3 class="experience-name">{{ exp.name }}</h3>
+                        <span class="experience-years">{{ exp.years_of_experience }} Yıl</span>
+                    </div>
+                    <div class="experience-details">
+                        <p class="description">{{ exp.description }}</p>
+                        {% if exp.related_projects.all %}
+                            <div class="related-projects">
+                                <h4>İlgili Projeler:</h4>
+                                <ul>
+                                    {% for project in exp.related_projects.all %}
+                                        <li>{{ project.title }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Skills Modal -->
+<div id="skillsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeSkillsModal()">&times;</span>
+        <h2 class="modal-title">Yetenekler</h2>
+        <div class="skills-content">
+            <div class="skills-tree">
+                {% for skill in skills %}
+                    {% if not skill.parent %}  <!-- Ana kategoriler -->
+                        <div class="skill-card parent-skill level-0" data-name="{{ skill.name }}">
+                            <div class="skill-header">
+                                <h3 class="skill-name">
+                                    <i class="fas fa-folder"></i>
+                                    {{ skill.name }}
+                                </h3>
+                                <span class="skill-level" data-level="{{ skill.level }}">
+                                    {{ skill.get_level_display }}
+                                </span>
+                            </div>
+                            <div class="skill-details">
+                                <p class="experience">{{ skill.years_of_experience }} Yıl Deneyim</p>
+                                {% if skill.description %}
+                                    <p class="description">{{ skill.description }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Alt yetenekler -->
+                            {% for child in skill.children.all %}
+                                <div class="skill-card level-1">
+                                    <div class="skill-header">
+                                        <h3 class="skill-name">
+                                            <i class="fas fa-code"></i>
+                                            {{ child.name }}
+                                        </h3>
+                                        <span class="skill-level" data-level="{{ child.level }}">
+                                            {{ child.get_level_display }}
+                                        </span>
+                                    </div>
+                                    <div class="skill-details">
+                                        <p class="experience">{{ child.years_of_experience }} Yıl Deneyim</p>
+                                        {% if child.description %}
+                                            <p class="description">{{ child.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Certificates Modal -->
+<div id="certificatesModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeCertificatesModal()">&times;</span>
+        <h2 class="modal-title">Sertifikalar</h2>
+        <div class="certificates-content">
+            {% for cert in certificates %}
+                <div class="certificate-card">
+                    <div class="certificate-header">
+                        <h3 class="certificate-name">{{ cert.name }}</h3>
+                        <span class="certificate-date">{{ cert.date|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="certificate-details">
+                        <p class="description">{{ cert.description }}</p>
+                        {% if cert.url %}
+                            <a href="{{ cert.url }}" target="_blank" class="certificate-link">Sertifikayı Görüntüle</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: radial-gradient(circle at 50% 30%, #F29AC0 0%, 20%, rgba(242, 154, 192, 0) 40%),
+        radial-gradient(circle at 30% 20%, #CEFC77 0%, 14.8%, rgba(206, 252, 119, 0) 40%),
+        radial-gradient(circle at 40% 50%, #FFFFFF 0%, 100%, rgba(255, 255, 255, 0) 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        position: relative;
+    }
+    .creator-profile {
+        position: relative;
+        max-width: 1000px;
+        height: 550px;
+        margin: 0 auto;
+        padding: 20px;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        border: 2px solid #333;
+        backdrop-filter: blur(5px);
+    }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .social-icon {
+        font-size: 24px;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .profile-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        background: transparent;
+        backdrop-filter: none;
+        padding: 20px 0;
+    }
+
+    .profile-info h1 {
+        font-size: 64px;
+        font-weight: 900;
+        margin: 0;
+        color: #000;
+        font-family: 'Arial Black', sans-serif;
+        letter-spacing: -1px;
+    }
+
+    .profile-info h2 {
+        font-size: 32px;
+        font-style: italic;
+        color: #333;
+        margin: 10px 0;
+        font-family: 'Arial', sans-serif;
+        font-weight: 300;
+    }
+
+    .avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .avatar:hover{
+        transition: transform 0.2s;
+        transform: scale(1.1);
+    }
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 15px;
+    }
+
+    .action-button {
+        flex: 1;
+        background: transparent;
+        border: 2px solid #333;
+        border-radius: 15px;
+        padding: 15px 20px;
+        font-size: 16px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        text-align: center;
+        text-decoration: none;
+        color: #333;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-transform: uppercase;
+        font-style: italic;
+    }
+
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    @media (max-width: 768px) {
+        .button-row {
+            flex-direction: column;
+        }
+        
+        .profile-container {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .profile-info {
+            margin-bottom: 20px;
+        }
+
+        .profile-info h1 {
+            font-size: 48px;
+        }
+
+        .profile-info h2 {
+            font-size: 24px;
+        }
+    }
+
+    .profile-avatar {
+        width: 300px;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.3s ease;
+    }
+
+    .profile-avatar:hover {
+        animation: wiggle 1s ease-in-out infinite;
+    }
+
+    .profile-avatar:not(:hover) {
+        transform: translate(0, 0);
+        animation: none;
+    }
+
+    @keyframes wiggle {
+        0% { transform: translate(0, 0); }
+        25% { transform: translate(-5px, 5px); }
+        50% { transform: translate(5px, -5px); }
+        75% { transform: translate(5px, 5px); }
+        100% { transform: translate(0, 0); }
+    }
+
+    .lottie-avatar {
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        font-family: 'Poppins', sans-serif;
+        background-color: #ffffff;
+        position: relative;
+        margin: 50px auto;
+        width: calc(100% - 100px);
+        max-width: 800px;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        animation: modalOpen 0.3s ease-out;
+    }
+
+    .close-button {
+        position: absolute;
+        right: 25px;
+        top: 25px;
+        width: 30px;
+        height: 30px;
+        background: #f8f9fa;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .close-button:hover {
+        background: #333;
+        color: #ffffff;
+    }
+
+    .about-content {
+        margin-top: 20px;
+        line-height: 1.6;
+    }
+
+    @keyframes modalOpen {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Mobil için modal ayarları */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 90%;
+            margin: 20% auto;
+            padding: 20px;
+        }
+    }
+
+    .field-of-study {
+        font-size: 1.2em;  /* veya istediğiniz bir değer: 18px gibi */
+        font-weight: bold;
+        margin-top: 5px;  /* üstteki derece ile arasına biraz boşluk */
+    }
+
+    .education-item {
+        margin-bottom: 20px;  /* her eğitim öğesi arasına boşluk */
+    }
+
+    /* Modal genel stilleri */
+    .education-modal {
+        max-width: 600px;
+        padding: 30px;
+        border-radius: 15px;
+    }
+
+    .modal-title {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 2rem;
+        color: #2d3436;
+        margin-bottom: 1.5rem;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #eef2f7;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1;
+        text-align: center;
+    }
+    /* About Modal özel stilleri */
+    .about-card {
+        background: #ffffff;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        border: 1px solid #eef2f7;
+        transition: all 0.3s ease;
+    }
+    .about-message {
+        color: #636e72;
+        font-size: 16px;
+        line-height: 1.8;
+        font-family: 'Inter', sans-serif;
+        text-align: justify;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border-left: 4px solid #00cec9;
+    }
+    /* Eğitim kartı stilleri */
+    .education-card {
+        font-family: 'Inter', sans-serif;
+        background: #fff;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .education-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .education-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .institution-name {
+        color: #2c3e50;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .education-date {
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 15px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .education-details {
+        font-family: 'Poppins', sans-serif;
+        padding-left: 10px;
+        border-left: 3px solid #3498db;
+    }
+
+    .degree {
+        color: #666;
+        margin: 5px 0;
+        font-size: 16px;
+    }
+
+    .field-of-study {
+        color: #2c3e50;
+        font-size: 18px;
+        font-weight: bold;
+        margin: 5px 0;
+    }
+
+    /* Scroll bar stilleri */
+    .education-content {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .education-content::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .education-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .education-content::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .education-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Modal kapatma butonu */
+    .close-button {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        color: #666;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .close-button:hover {
+        color: white;
+        background: #333;
+    }
+
+    /* Card Styles */
+    .experience-card,
+    .skill-card,
+    .certificate-card {
+        font-family: 'Inter', sans-serif;
+        background: #fff;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .experience-card:hover,
+    .skill-card:hover,
+    .certificate-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    /* Header Styles */
+    .experience-header,
+    .skill-header,
+    .certificate-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    /* Details Styles */
+    .experience-details,
+    .skill-details,
+    .certificate-details {
+        font-family: 'Poppins', sans-serif;
+        padding-left: 10px;
+        border-left: 3px solid #3498db;
+    }
+
+    /* Link Styles */
+    .certificate-link {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 5px 15px;
+        background: #00cec9;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background 0.2s ease;
+    }
+
+    .certificate-link:hover {
+        background: #2980b9;
+    }
+
+    /* Level Badge Styles */
+    .skill-level {
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 15px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    /* Scroll bar stilleri */
+    .modal-content::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .modal-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Modal başlığını sabit tutmak için */
+    .modal-title {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 15px 0;
+        margin-top: 0;
+        z-index: 1;
+    }
+
+    /* Kapatma butonunu sabit tutmak için */
+    .close-button {
+        position: sticky;
+        top: 15px;
+        right: 15px;
+        z-index: 2;
+    }
+
+    /* İçerik alanı için margin */
+    .experience-content,
+    .skills-content,
+    .certificates-content,
+    .education-content {
+        margin-top: 20px;
+    }
+
+    /* Skills tree styles */
+    .skills-tree {
+        padding: 20px;
+    }
+
+    .skill-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .skill-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    /* Parent skill kartları için özel stiller */
+    .parent-skill {
+        background: #f8f9fa;
+        border-left: 4px solid #3498db;
+    }
+
+    /* Level'lara göre girintiler ve renkler */
+    .level-0 {
+        margin-left: 0;
+        border-left-color: #3498db;
+    }
+
+    .level-1 {
+        margin-left: 30px;
+        border-left-color: #2ecc71;
+    }
+
+    .level-2 {
+        margin-left: 60px;
+        border-left-color: #e74c3c;
+    }
+
+    /* Skill header içindeki ikonlar için stiller */
+    .skill-header i {
+        margin-right: 10px;
+        color: #666;
+    }
+
+    .children {
+        margin-top: 15px;
+    }
+
+    /* Skill seviye badge'leri için stiller */
+    .skill-level {
+        background: #e9ecef;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 14px;
+        color: #495057;
+    }
+
+    /* Kategori ikonları */
+    .skill-header i.fa-folder {
+        color: #f39c12;
+    }
+
+    .skill-header i.fa-code {
+        color: #3498db;
+    }
+
+    /* Her ana kategori için özel renkler */
+    .skill-card[data-name*="Programlama"] {
+        border-left-color: #3498db;
+    }
+
+    .skill-card[data-name*="Veritabanı"] {
+        border-left-color: #2ecc71;
+    }
+
+    .skill-card[data-name*="Web"] {
+        border-left-color: #e74c3c;
+    }
+
+    .skill-card[data-name*="Görselleştirme"] {
+        border-left-color: #9b59b6;
+    }
+
+    .skill-card[data-name*="Araçlar"] {
+        border-left-color: #f1c40f;
+    }
+
+    .skill-card[data-name*="Analitik"] {
+        border-left-color: #1abc9c;
+    }
+
+    /* Seviye badge'leri */
+
+    .skill-level[data-level="Expert"] {
+        background: #2ecc71;
+        color: white;
+    }
+
+    .skill-level[data-level="Advanced"] {
+        background: #3498db;
+        color: white;
+    }
+
+    .skill-level[data-level="Intermediate"] {
+        background: #f39c12;
+        color: white;
+    }
+
+    .skill-level[data-level="Beginner"] {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .cv-download-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 50px;
+        margin-bottom: 50px;
+        width: 100%;
+    }
+
+    .cv-download-button {
+        background: #F29AC0;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(242, 154, 192, 0.3);
+    }
+
+    .cv-download-button:hover {
+        background: #CEFC77;
+        color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(206, 252, 119, 0.4);
+    }
+
+    .cv-download-button .pdf-icon {
+        font-size: 1.2em;
+        transition: transform 0.3s ease;
+    }
+
+    .cv-download-button:hover .pdf-icon {
+        transform: rotate(-10deg);
+    }
+
+    /* İndirme animasyonu */
+    .downloading {
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(242, 154, 192, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(242, 154, 192, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(242, 154, 192, 0);
+        }
+    }
+
+    /* Mobil için responsive tasarım */
+    @media (max-width: 768px) {
+        .cv-download-container {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .cv-download-button {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+    }
+</style>
+
+<script>
+    // İndirme animasyonu için JavaScript
+    document.getElementById('downloadButton').addEventListener('click', function(e) {
+        this.classList.add('downloading');
+        
+        // Animasyonu 3 saniye sonra kaldır
+        setTimeout(() => {
+            this.classList.remove('downloading');
+        }, 3000);
+    });
+
+    // Hover efekti için smooth transition
+    document.getElementById('downloadButton').addEventListener('mouseover', function() {
+        this.querySelector('.pdf-icon').style.transform = 'rotate(-10deg)';
+    });
+
+    document.getElementById('downloadButton').addEventListener('mouseout', function() {
+        this.querySelector('.pdf-icon').style.transform = 'rotate(0deg)';
+    });
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // avatar hover effect
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatar = document.getElementById('avatarAnimation');
+        const container = document.getElementById('avatarContainer');
+        
+        avatar.addEventListener('mouseenter', function() {
+            avatar.pause();
+        });
+        
+        avatar.addEventListener('mouseleave', function() {
+            avatar.play();
+            container.style.transform = 'none';
+        });
+
+        container.addEventListener('mousemove', function(e) {
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const angleX = (mouseX - centerX) / centerX * 180;
+            const angleY = (mouseY - centerY) / centerY * 180;
+            container.style.transform = `rotateY(${angleX}deg) rotateX(${angleY}deg)`;
+        });
+    });
+
+    // action button hover effect
+    document.querySelectorAll('.action-button').forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            button.style.transform = 'scale(1.05)';
+        });
+    });
+
+    document.querySelectorAll('.action-button').forEach(button => {
+        button.addEventListener('mouseleave', function() {
+            button.style.transform = 'scale(1)';
+        });
+    });
+
+    // Modal functions
+    function openAboutModal() {
+        document.getElementById('aboutModal').style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Arka planı scroll edilemez yap
+    }
+
+    function closeAboutModal() {
+        document.getElementById('aboutModal').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Scroll'u geri aç
+    }
+
+    // Modal dışına tıklandığında kapatma
+    window.onclick = function(event) {
+        const modals = [
+            'aboutModal',
+            'educationModal',
+            'experienceModal',
+            'skillsModal',
+            'certificatesModal'
+        ];
+        
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (event.target == modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+
+    // ESC tuşu ile kapatma
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modals = [
+                'aboutModal',
+                'educationModal',
+                'experienceModal',
+                'skillsModal',
+                'certificatesModal'
+            ];
+            
+            modals.forEach(modalId => {
+                document.getElementById(modalId).style.display = 'none';
+            });
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Education Modal functions
+    function openEducationModal() {
+        document.getElementById('educationModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEducationModal() {
+        document.getElementById('educationModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Experience Modal
+    function openExperienceModal() {
+        document.getElementById('experienceModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeExperienceModal() {
+        document.getElementById('experienceModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Skills Modal
+    function openSkillsModal() {
+        document.getElementById('skillsModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSkillsModal() {
+        document.getElementById('skillsModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Certificates Modal
+    function openCertificatesModal() {
+        document.getElementById('certificatesModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCertificatesModal() {
+        document.getElementById('certificatesModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function generatePDF() {
+        fetch('/generate-pdf/')
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'portfolio.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            })
+            .catch(error => console.error('PDF oluşturma hatası:', error));
+    }
+</script>
+{% endblock %}
